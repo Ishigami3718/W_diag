@@ -1,15 +1,20 @@
+using System.Diagnostics;
+
 namespace W_Diag
 {
     public partial class Form1 : Form
     {
         static List<Point> p = new List<Point>();
-        static List<Color> c = new List<Color>() { Color.Red, Color.Blue, Color.Green, Color.Gold, Color.Gray, Color.Azure };
+        static List<Color> c = new List<Color>() { Color.Red, Color.Blue, Color.Green, Color.Gold, Color.Gray, Color.Azure,
+        Color.Aquamarine,Color.DeepPink,Color.DarkSalmon,Color.Magenta,Color.Brown,Color.Coral,Color.Crimson,Color.SeaGreen};
         int count = 0;
-        Color[,] pix; 
+        Color[,] pix;
+        //Bitmap bmp;
         public Form1()
         {
             InitializeComponent();
-            pix = new Color[pictureBox1.Width,pictureBox1.Height];
+            pix = new Color[pictureBox1.Width, pictureBox1.Height];
+            //bmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
         }
 
 
@@ -32,7 +37,7 @@ namespace W_Diag
             int rx = (x + 1) * stepX;
             int ly = y * stepY;
             int ry = (y + 1) * stepY;
-            if (x>2 || x<0 || y>1 || y<0)
+            if (x > 2 || x < 0 || y > 1 || y < 0)
             {
                 lx = 0;
                 rx = pictureBox1.Width;
@@ -58,6 +63,7 @@ namespace W_Diag
                     }
                     //g.FillRectangle(new SolidBrush(c[minValIndx % c.Count]), i, j, 1, 1);
                     pix[i, j] = c[minValIndx % c.Count];
+                    //bmp.SetPixel(i, j, c[minValIndx % c.Count]);
                 }
             }
         }
@@ -65,11 +71,11 @@ namespace W_Diag
         private void Filling()
         {
             Graphics g = pictureBox1.CreateGraphics();
-            for(int i = 0; i < pictureBox1.Width; i++)
+            for (int i = 0; i < pictureBox1.Width; i++)
             {
-                for( int j = 0; j < pictureBox1.Height; j++)
+                for (int j = 0; j < pictureBox1.Height; j++)
                 {
-                    g.FillRectangle(new SolidBrush(pix[i,j]), i, j, 1, 1);
+                    g.FillRectangle(new SolidBrush(pix[i, j]), i, j, 1, 1);
                 }
             }
             for (int i = 0; i < p.Count; i++)
@@ -77,13 +83,26 @@ namespace W_Diag
                 g.DrawEllipse(new Pen(Color.Black, 5), p[i].X, p[i].Y, 10, 10);
                 g.FillEllipse(new SolidBrush(c[i % c.Count]), p[i].X, p[i].Y, 10, 10);
             }
+            /*pictureBox1.Image = bmp;
+            for (int i = 0; i < p.Count; i++)
+            {
+                g.DrawEllipse(new Pen(Color.Black, 5), p[i].X, p[i].Y, 10, 10);
+                g.FillEllipse(new SolidBrush(c[i % c.Count]), p[i].X, p[i].Y, 10, 10);
+            }*/
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Graphics g = pictureBox1.CreateGraphics();
+            var process = Process.GetCurrentProcess();
+            Stopwatch sw = new Stopwatch();
+            TimeSpan cpuStart = process.TotalProcessorTime;
+            sw.Start();
             Painting(-1, -1);
             Filling();
+            sw.Stop();
+            TimeSpan cpuEnd = process.TotalProcessorTime;
+            TimeSpan cpuUsed = cpuEnd - cpuStart;
+            label1.Text = $"Real time:\n{sw.ElapsedMilliseconds}\nCPU time:\n{cpuUsed.TotalMilliseconds}";
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -92,18 +111,42 @@ namespace W_Diag
             p = new List<Point>();
             count = 0;
             pix = new Color[pictureBox1.Width, pictureBox1.Height];
+            //bmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            for (int i = 0;i<3;i++)
+            var process = Process.GetCurrentProcess();
+            Stopwatch sw = new Stopwatch();
+            TimeSpan cpuStart = process.TotalProcessorTime;
+            sw.Start();
+            for (int i = 0; i < 3; i++)
             {
-                for(int j = 0;j<2;j++)
+                for (int j = 0; j < 2; j++)
                 {
-                    new Thread(()=>Painting(i,j)).Start();
+                    new Thread(() => Painting(i, j)).Start();
                 }
             }
             Filling();
+            sw.Stop();
+            TimeSpan cpuEnd = process.TotalProcessorTime;
+            TimeSpan cpuUsed = cpuEnd - cpuStart;
+            label1.Text = $"Real time:\n{sw.ElapsedMilliseconds}\nCPU time:\n{cpuUsed.TotalMilliseconds}";
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Graphics g = pictureBox1.CreateGraphics();
+            Random rnd = new Random();
+            for (int i = 0; i < 100; i++)
+            {
+                int x = rnd.Next(0, pictureBox1.Width);
+                int y = rnd.Next(0, pictureBox1.Height);
+                p.Add(new Point(x, y));
+                g.DrawEllipse(new Pen(Color.Black, 5), x, y, 10, 10);
+                g.FillEllipse(new SolidBrush(c[count % c.Count]), x, y, 10, 10);
+                count++;
+            }
         }
     }
 }
