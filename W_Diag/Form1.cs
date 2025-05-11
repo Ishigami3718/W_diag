@@ -5,9 +5,11 @@ namespace W_Diag
         static List<Point> p = new List<Point>();
         static List<Color> c = new List<Color>() { Color.Red, Color.Blue, Color.Green, Color.Gold, Color.Gray, Color.Azure };
         int count = 0;
+        Color[,] pix; 
         public Form1()
         {
             InitializeComponent();
+            pix = new Color[pictureBox1.Width,pictureBox1.Height];
         }
 
 
@@ -37,7 +39,7 @@ namespace W_Diag
                 ly = 0;
                 ry = pictureBox1.Height;
             }
-            Graphics g = pictureBox1.CreateGraphics();
+            //Graphics g = pictureBox1.CreateGraphics();
             for (int i = lx; i < rx; i++)
             {
                 for (int j = ly; j < ry; j++)
@@ -54,15 +56,22 @@ namespace W_Diag
                             minValIndx = k;
                         }
                     }
-                    g.FillRectangle(new SolidBrush(c[minValIndx % c.Count]), i, j, 1, 1);
+                    //g.FillRectangle(new SolidBrush(c[minValIndx % c.Count]), i, j, 1, 1);
+                    pix[i, j] = c[minValIndx % c.Count];
                 }
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Filling()
         {
             Graphics g = pictureBox1.CreateGraphics();
-            Painting(-1, -1);
+            for(int i = 0; i < pictureBox1.Width; i++)
+            {
+                for( int j = 0; j < pictureBox1.Height; j++)
+                {
+                    g.FillRectangle(new SolidBrush(pix[i,j]), i, j, 1, 1);
+                }
+            }
             for (int i = 0; i < p.Count; i++)
             {
                 g.DrawEllipse(new Pen(Color.Black, 5), p[i].X, p[i].Y, 10, 10);
@@ -70,11 +79,19 @@ namespace W_Diag
             }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Graphics g = pictureBox1.CreateGraphics();
+            Painting(-1, -1);
+            Filling();
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             pictureBox1.Invalidate();
             p = new List<Point>();
             count = 0;
+            pix = new Color[pictureBox1.Width, pictureBox1.Height];
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -83,15 +100,10 @@ namespace W_Diag
             {
                 for(int j = 0;j<2;j++)
                 {
-                    new Task(()=>Painting(i,j)).Start();
+                    new Thread(()=>Painting(i,j)).Start();
                 }
             }
-            Graphics g = pictureBox1.CreateGraphics();
-            for (int i = 0; i < p.Count; i++)
-            {
-                g.DrawEllipse(new Pen(Color.Black, 5), p[i].X, p[i].Y, 10, 10);
-                g.FillEllipse(new SolidBrush(c[i % c.Count]), p[i].X, p[i].Y, 10, 10);
-            }
+            Filling();
         }
     }
 }
