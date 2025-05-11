@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Threading;
 
 namespace W_Diag
 {
@@ -9,12 +10,12 @@ namespace W_Diag
         Color.Aquamarine,Color.DeepPink,Color.DarkSalmon,Color.Magenta,Color.Brown,Color.Coral,Color.Crimson,Color.SeaGreen};
         int count = 0;
         Color[,] pix;
-        //Bitmap bmp;
+        Bitmap bmp;
         public Form1()
         {
             InitializeComponent();
             pix = new Color[pictureBox1.Width, pictureBox1.Height];
-            //bmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            bmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
         }
 
 
@@ -75,9 +76,11 @@ namespace W_Diag
             {
                 for (int j = 0; j < pictureBox1.Height; j++)
                 {
-                    g.FillRectangle(new SolidBrush(pix[i, j]), i, j, 1, 1);
+                    //g.FillRectangle(new SolidBrush(pix[i, j]), i, j, 1, 1);
+                    bmp.SetPixel(i, j, pix[i,j]);
                 }
             }
+            pictureBox1.Image = bmp;
             for (int i = 0; i < p.Count; i++)
             {
                 g.DrawEllipse(new Pen(Color.Black, 5), p[i].X, p[i].Y, 10, 10);
@@ -91,18 +94,29 @@ namespace W_Diag
             }*/
         }
 
+        private void PixInBmp()
+        {
+            /*for(int i = 0;i<pictureBox1.Width;i++)
+            {
+                for(int j = 0;j < pictureBox1.Height;j++)
+                {
+                    bmp.SetPixel(i, j, pix[i,j]);
+                }
+            }*/
+        }
         private void button1_Click(object sender, EventArgs e)
         {
             var process = Process.GetCurrentProcess();
             Stopwatch sw = new Stopwatch();
             TimeSpan cpuStart = process.TotalProcessorTime;
             sw.Start();
-            Painting(-1, -1);
+            Painting(-1,-1);
             Filling();
             sw.Stop();
             TimeSpan cpuEnd = process.TotalProcessorTime;
             TimeSpan cpuUsed = cpuEnd - cpuStart;
             label1.Text = $"Real time:\n{sw.ElapsedMilliseconds}\nCPU time:\n{cpuUsed.TotalMilliseconds}";
+            //Filling();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -120,18 +134,25 @@ namespace W_Diag
             Stopwatch sw = new Stopwatch();
             TimeSpan cpuStart = process.TotalProcessorTime;
             sw.Start();
+            List<Thread> threads = new List<Thread>();
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 2; j++)
                 {
-                    new Thread(() => Painting(i, j)).Start();
+                    int ii = i;
+                    int jj = j;
+                  Thread newThread =  new Thread(() => Painting(ii, jj));
+                    threads.Add(newThread);
+                    newThread.Start();
                 }
             }
+            foreach (Thread thread in threads) { thread.Join(); }
             Filling();
             sw.Stop();
             TimeSpan cpuEnd = process.TotalProcessorTime;
             TimeSpan cpuUsed = cpuEnd - cpuStart;
             label1.Text = $"Real time:\n{sw.ElapsedMilliseconds}\nCPU time:\n{cpuUsed.TotalMilliseconds}";
+            //Filling();
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -147,6 +168,20 @@ namespace W_Diag
                 g.FillEllipse(new SolidBrush(c[count % c.Count]), x, y, 10, 10);
                 count++;
             }
+        }
+
+        private void pictureBox1_SizeChanged(object sender, EventArgs e)
+        {
+             Color[,] lastPix = (Color[,])pix.Clone();
+             pix = new Color[pictureBox1.Width, pictureBox1.Height];
+             for(int i = 0;i < lastPix.GetLength(0); i++)
+             {
+                 for(int j = 0;j < lastPix.GetLength(1); j++)
+                 {
+                     pix[i, j] = lastPix[i, j];
+                 }
+             }
+            bmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
         }
     }
 }

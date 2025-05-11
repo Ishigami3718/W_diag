@@ -56,6 +56,7 @@
             pictureBox1.Size = new Size(644, 377);
             pictureBox1.TabIndex = 1;
             pictureBox1.TabStop = false;
+            pictureBox1.SizeChanged += pictureBox1_SizeChanged;
             pictureBox1.MouseClick += pictureBox1_MouseClick;
             // 
             // button2
