@@ -71,7 +71,7 @@ namespace W_Diag
 
         private void Filling()
         {
-            Graphics g = pictureBox1.CreateGraphics();
+            //Graphics g = pictureBox1.CreateGraphics();
             for (int i = 0; i < pictureBox1.Width; i++)
             {
                 for (int j = 0; j < pictureBox1.Height; j++)
@@ -81,6 +81,7 @@ namespace W_Diag
                 }
             }
             pictureBox1.Image = bmp;
+            Graphics g = Graphics.FromImage(bmp);
             for (int i = 0; i < p.Count; i++)
             {
                 g.DrawEllipse(new Pen(Color.Black, 5), p[i].X, p[i].Y, 10, 10);
@@ -125,7 +126,8 @@ namespace W_Diag
             p = new List<Point>();
             count = 0;
             pix = new Color[pictureBox1.Width, pictureBox1.Height];
-            //bmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            bmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            pictureBox1.Image = bmp;
         }
 
         private void button3_Click(object sender, EventArgs e)
