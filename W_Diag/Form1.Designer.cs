@@ -30,6 +30,8 @@
         {
             button1 = new Button();
             pictureBox1 = new PictureBox();
+            button2 = new Button();
+            button3 = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -52,11 +54,33 @@
             pictureBox1.TabStop = false;
             pictureBox1.MouseClick += pictureBox1_MouseClick;
             // 
+            // button2
+            // 
+            button2.Location = new Point(694, 47);
+            button2.Name = "button2";
+            button2.Size = new Size(94, 29);
+            button2.TabIndex = 2;
+            button2.Text = "Clear";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(694, 82);
+            button3.Name = "button3";
+            button3.Size = new Size(94, 29);
+            button3.TabIndex = 3;
+            button3.Text = "MultyGen";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(button3);
+            Controls.Add(button2);
             Controls.Add(pictureBox1);
             Controls.Add(button1);
             Name = "Form1";
@@ -69,5 +93,7 @@
 
         private Button button1;
         private PictureBox pictureBox1;
+        private Button button2;
+        private Button button3;
     }
 }
